@@ -3,19 +3,21 @@ import './App.css';
 import * as Quill from 'quill'
 import QuillBetterTable from 'quill-better-table'
 import ReactModal from 'react-modal'
+import CodeMirror from 'react-codemirror';
+import 'codemirror/lib/codemirror.css';
 
 Quill.register({
   'modules/better-table': QuillBetterTable
 }, true)
 
 ReactModal.setAppElement('#root')
-
+// ReactModal.defaultStyles.overlay.backgroundColor = '#d9d9d9';
 class App extends React.Component {
   constructor(){
     super();
     this.state={
        showModal: false,
-       obj:{}
+       obj:JSON.stringify({})
     }
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -56,53 +58,52 @@ var quill = new Quill('#editor-container', {
   placeholder: 'Compose an epic...',
   theme: 'snow'  // or 'bubble'
 });
-quill.root.innerHTML = "<p><strong class=\"ql-size-large\"><em>[This is sample question]<\/em><\/strong><\/p>";
+quill.root.innerHTML = "<p><strong><em>[This is sample question]</em></strong></p>";
 this.Question=quill
 var o1 = new Quill('#o1', {
   placeholder: '[Choice 1]...',
   theme: 'snow'  // or 'bubble'
 });
-o1.root.innerHTML = "<p><strong class=\"ql-size-large\">[Choice 1]<\/strong><\/p>";
+o1.root.innerHTML = "<p><strong>[Choice 1]</strong></p>";
 this.option1=o1
 var o2 = new Quill('#o2', {
   placeholder: '[Choice 2]...',
   theme: 'snow'  // or 'bubble'
 });
-o2.root.innerHTML = "<p><strong class=\"ql-size-large\">[Choice 2]<\/strong><\/p>";
+o2.root.innerHTML = "<p><strong>[Choice 2]</strong></p>";
 this.option2=o2
 var o3 = new Quill('#o3', {
   placeholder: '[Choice 3]...',
   theme: 'snow'  // or 'bubble'
 });
-o3.root.innerHTML = "<p><strong class=\"ql-size-large\">[Choice 3]<\/strong><\/p>";
+o3.root.innerHTML = "<p><strong>[Choice 3]</strong></p>";
 this.option3=o3
 var o4 = new Quill('#o4', {
   placeholder: '[Choice 4]...',
   theme: 'snow'  // or 'bubble'
 });
-o4.root.innerHTML = "<p><strong class=\"ql-size-large\">[Choice 4]<\/strong><\/p>";
+o4.root.innerHTML = "<p><strong>[Choice 4]</strong></p>";
 this.option4=o4
+
 
 }
   
-  setOption(value){
-    if(value==="1")
-      document.querySelector('#node1').innerHTML=this.refs.o1.value
-    else if(value==="2")
-      document.querySelector('#node2').innerHTML=this.refs.o2.value
-    else if(value==="3")
-      document.querySelector('#Li1').innerHTML=this.refs.o3.value
-    else if(value==="4")
-      document.querySelector('#Li2').innerHTML=this.refs.o4.value
-  }
   saveData(){
     //this.handleOpenModal
-    let obj={
-      type:'mcq-t1',
-      question:this.Question.getText(),
-      answers:[this.option1.getText(), this.option2.getText(),this.option3.getText(), this.option4.getText()],
-      correctAnswer:this.refs.answer.value
-    }
+    // let obj={
+    //   type:'mcq-t1',
+    //   question:this.Question.getText(),
+    //   answers:[this.option1.getText(), this.option2.getText(),this.option3.getText(), this.option4.getText()],
+    //   correctAnswer:this.refs.answer.value
+    // }
+    var ans=''
+    let radios = (document.querySelectorAll('input[type="radio"]'))
+    radios.forEach(function(r){
+        if(r.checked)
+        {
+          ans = r.value;
+        }
+      })
     let ob = {
     "options": [{
         "label": this.option1.getText(),
@@ -123,68 +124,89 @@ this.option4=o4
         "scoring_type": "exactMatch",
         "valid_response": {
             "score": 1,
-            "value": ["0"]
+            "value": [ans]
         }
     },
     "ui_style": {
         "type": "horizontal"
     }
 }
-    this.setState({obj:ob})
-    return obj
+  var finalObject = JSON.stringify(ob, null, 4);
+  finalObject = finalObject.replace(/\\n/g, '');
+  this.setState({obj:finalObject})
   }
   
   
-  
+  updateCode(newCode) {
+    this.setState({
+      obj: newCode,
+    });
+  }
+  saveMarkup(){
+    let obj = JSON.parse(this.state.obj)
+    this.option1.root.innerHTML = `<p><strong>${obj.options[0].label}</strong></p>`
+    this.option2.root.innerHTML = `<p><strong>${obj.options[1].label}</strong></p>`
+    this.option3.root.innerHTML = `<p><strong>${obj.options[2].label}</strong></p>`
+    this.option4.root.innerHTML = `<p><strong>${obj.options[3].label}</strong></p>`
+    this.Question.root.innerHTML= `<p><strong>${obj.stimulus}</strong></p>`
+    this.handleCloseModal()
+  }
   render(){
-    let ar = Object.entries(this.state.obj);
+    let options = {
+      lineNumbers: true,
+      lineWrapping:true
+    };
+    const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : '50%',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
   return (
     
-    <div className="App" style={{padding:5+'%', margin:5+'%'}}>
+    <div className="App" style={{padding:3+'%', margin:3+'%'}}>
+      <label>Sample Testing of MCQ Template</label>
       <div id="editor-container"></div>
       <div ref="op1" id="o1"></div>
       <div id="o2"></div>
       <div id="o3"></div>
       <div id="o4"></div>
-          
       <ReactModal 
            isOpen={this.state.showModal}
            contentLabel="Modal #1 Global Style Override Example"
            onRequestClose={this.handleCloseModal}
+           style={customStyles}
         >
-          <p>Modal text!</p>
-          {JSON.stringify(this.state.obj)}
-          {/*ar.map(a=>{
-            let k = a[0]
-            let v = a[1]
-            var fv
-            if(typeof(v)==='object'){
-              fv = Object.entries(v)
-              fv.map(fv=>{
-                if(typeof(fv)==='object')
-                  fv = (Object.entries(fv))
-                else
-                  fv = fv
-              })
-            }
-            else
-              fv = v
-           return(<div><p>{k} : {fv.toString()}</p></div>)
-          })*/}
+          <div className="bg-info"><label style={{padding:0.2+'%'}}>Source</label></div>
+          <CodeMirror style={{height:'auto'}} value={this.state.obj} onChange={this.updateCode.bind(this)} options={options} />
           <br/><br/>
-          <button onClick={this.handleCloseModal}>Close Modal</button>
+          
+          <div>
+          <center>
+          <button className="btn btn-success" style={{marginLeft:1+'%'}} onClick={this.saveMarkup.bind(this)}>Apply</button>
+          <button className="btn btn-success" style={{marginLeft:1+'%'}} onClick={this.handleCloseModal}>Cancel</button>
+          
+          </center>
+          </div>
         </ReactModal>  
 
-    <div className="pull-left">
+    <div>
     <label>Select correct answer</label>
-    <input type="radio" name="ans" ref="answer" value="A"/> A
-    <input type="radio" name="ans" ref="answer" value="B"/> B
-    <input type="radio" name="ans" ref="answer" value="C"/> C
-    <input type="radio" name="ans" ref="answer" value="D"/> D
+    <input type="radio" name="ans" ref="answer" value="0"/> A
+    <input type="radio" name="ans" ref="answer" value="1"/> B
+    <input type="radio" name="ans" ref="answer" value="2"/> C
+    <input type="radio" name="ans" ref="answer" value="3"/> D
     </div>
     <br/><br/>
     
-    <button value="Save" className="btn btn-success" onClick={()=>{var ob = this.saveData();  this.handleOpenModal()}}>Save</button>
+    <button value="Save" className="btn btn-success" onClick={()=>{this.saveData();  this.handleOpenModal()}}>Source</button>
+    
+    <br/><br/>
+    
     </div>
   );
 }

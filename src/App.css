@@ -23,14 +23,8 @@
 #editor-container {
   height: 275px;
 }
-.droptarget {
-  float: left; 
-  width: 100px; 
-  height: 35px;
-  margin: 15px;
-  padding: 10px;
-  border: 1px solid #aaaaaa;
+
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto !important;
 }
-/*#o1 {
-  height: 100px;
-}*/
