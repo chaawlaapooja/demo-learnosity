@@ -60,31 +60,46 @@ var quill = new Quill('#editor-container', {
 });
 quill.root.innerHTML = "<p><strong><em>[This is sample question]</em></strong></p>";
 this.Question=quill
+quill.on('text-change', function(delta, oldDelta, source) {
+  console.log(oldDelta, quill.getText())
+  
+});
 var o1 = new Quill('#o1', {
   placeholder: '[Choice 1]...',
   theme: 'snow'  // or 'bubble'
 });
 o1.root.innerHTML = "<p><strong>[Choice 1]</strong></p>";
 this.option1=o1
+o1.on('text-change', ()=> {
+  this.refs.answer1.textContent = o1.getText()
+});
 var o2 = new Quill('#o2', {
   placeholder: '[Choice 2]...',
   theme: 'snow'  // or 'bubble'
 });
 o2.root.innerHTML = "<p><strong>[Choice 2]</strong></p>";
 this.option2=o2
+o2.on('text-change', ()=> {
+  this.refs.answer2.textContent = o2.getText()
+});
 var o3 = new Quill('#o3', {
   placeholder: '[Choice 3]...',
   theme: 'snow'  // or 'bubble'
 });
 o3.root.innerHTML = "<p><strong>[Choice 3]</strong></p>";
 this.option3=o3
+o3.on('text-change', ()=> {
+  this.refs.answer3.textContent = o3.getText()
+});
 var o4 = new Quill('#o4', {
   placeholder: '[Choice 4]...',
   theme: 'snow'  // or 'bubble'
 });
 o4.root.innerHTML = "<p><strong>[Choice 4]</strong></p>";
 this.option4=o4
-
+o4.on('text-change', ()=> {
+  this.refs.answer4.textContent = o4.getText()
+});
 
 }
   
@@ -152,6 +167,11 @@ this.option4=o4
     this.handleCloseModal()
   }
   render(){
+    if(this.o4)
+    if(this.o4.hasFocus()){
+      console.log(this.o4.getText(), this.refs.answer4.innerHTML)
+  this.refs.answer4.innerHTML=`<p>${this.o4.getText()}</p>`
+}
     let options = {
       lineNumbers: true,
       lineWrapping:true
@@ -196,10 +216,10 @@ this.option4=o4
 
     <div>
     <label>Select correct answer</label>
-    <input type="radio" name="ans" ref="answer" value="0"/> A
-    <input type="radio" name="ans" ref="answer" value="1"/> B
-    <input type="radio" name="ans" ref="answer" value="2"/> C
-    <input type="radio" name="ans" ref="answer" value="3"/> D
+    <input style={{marginLeft:2+'%'}} type="radio" name="ans" value="0"/><label ref="answer1"></label>
+    <input style={{marginLeft:2+'%'}} type="radio" name="ans" value="1"/><label ref="answer2"></label>
+    <input style={{marginLeft:2+'%'}} type="radio" name="ans" value="2"/><label ref="answer3"></label>
+    <input style={{marginLeft:2+'%'}} type="radio" name="ans" value="3"/><label ref="answer4"></label>
     </div>
     <br/><br/>
     
